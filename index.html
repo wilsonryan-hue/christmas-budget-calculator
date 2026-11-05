@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Christmas budget calculator (UK, £): split your total, weekly saving target, gift tracker</title>
+<meta name="description" content="Free one-file Christmas budget calculator. Enter your total, people and savings; get a pound split, a weekly saving target to 24 December and a gift tracker. Nothing saved or sent.">
+<style>
+:root{--red:#B91C1C;--green:#166534;--ink:#1F2937;--line:#D1D5DB;--bg:#FFFBEB}
+*{box-sizing:border-box}
+body{font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);margin:0;padding:1rem}
+.w{max-width:46rem;margin:0 auto}
+h1{font-size:1.6rem;margin:.2rem 0 .4rem;color:var(--red)}
+h2{font-size:1.15rem;margin:0 0 .5rem}
+.card{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:1rem;margin:1rem 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:.8rem}
+label{display:block;font-weight:600;margin-bottom:.2rem}
+input{font:inherit;border:1.5px solid var(--line);border-radius:8px;padding:.45rem .55rem;width:100%}
+button{font:inherit;font-weight:700;background:var(--green);color:#fff;border:0;border-radius:8px;padding:.6rem 1rem;cursor:pointer}
+button.alt{background:#374151}
+table{border-collapse:collapse;width:100%}
+th,td{padding:.4rem .3rem;border-bottom:1px solid var(--line);text-align:left}
+.r{text-align:right}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.6rem;margin:.6rem 0}
+.sum div{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:.6rem;font-size:.9rem}
+.sum b{display:block;font-size:1.3rem;color:var(--green)}
+.over{background:#FEE2E2;border-left:6px solid #B91C1C;border-radius:8px;padding:.6rem .8rem;margin:.6rem 0}
+.ok{background:#DCFCE7;border-left:6px solid #16A34A;border-radius:8px;padding:.6rem .8rem;margin:.6rem 0}
+.warn{background:#FEF3C7;border-left:6px solid #D97706;border-radius:8px;padding:.6rem .8rem;margin:.6rem 0}
+.muted{color:#6B7280;font-size:.9rem}
+@media print{button,.noprint{display:none!important}body{background:#fff}input{border:0;font-weight:700;padding:0}}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>Christmas budget calculator</h1>
+<p>Type what you can afford, how many people you are buying gifts for and what you have already set aside. You get a pound-by-pound split, a weekly saving target to <strong>24 December</strong>, and a gift tracker that tells you when you are over. UK pounds. Nothing is saved or sent anywhere.</p>
+
+<div class="card">
+ <h2>Your budget</h2>
+ <div class="grid">
+  <div><label for="total">Total you can afford (£)</label><input id="total" type="number" min="0" step="1" inputmode="decimal" value="300"></div>
+  <div><label for="saved">Already set aside (£)</label><input id="saved" type="number" min="0" step="1" inputmode="decimal" value="0"></div>
+  <div><label for="people">People for gifts</label><input id="people" type="number" min="1" max="60" step="1" inputmode="numeric" value="6"></div>
+  <div><label for="xmas">Christmas Day (for the countdown)</label><input id="xmas" type="date" value=""></div>
+ </div>
+ <p class="muted">The weekly target counts to Christmas Eve, the day before the date above.</p>
+</div>
+
+<div id="sum" class="sum"></div>
+<div id="msg"></div>
+
+<div class="card">
+ <h2>Where the money goes (suggested split)</h2>
+ <table><thead><tr><th>Part of Christmas</th><th class="r">Share</th><th class="r">Amount</th></tr></thead><tbody id="rows"></tbody>
+ <tfoot><tr><th>Total</th><th class="r">100%</th><th class="r" id="tot"></th></tr></tfoot></table>
+ <p class="muted" style="margin-bottom:0">The shares are a starting suggestion, not a rule. Change the numbers in the SPLIT list near the top of the script to suit your family.</p>
+</div>
+
+<div class="card">
+ <h2>Gift tracker</h2>
+ <p>Write each person's limit. The total is compared with your gifts pot.</p>
+ <table><thead><tr><th>Person</th><th>Limit (£)</th></tr></thead><tbody id="trk"></tbody>
+ <tfoot><tr><th>Total planned</th><th id="ttl">£0.00</th></tr></tfoot></table>
+ <div id="trkmsg"></div>
+</div>
+<p class="noprint"><button id="print" class="alt" type="button">Print my budget</button></p>
+
+<p class="muted">Simple arithmetic on the figures you type in. It is not financial advice. For free, impartial help with money worries see <a href="https://www.moneyhelper.org.uk/" rel="noopener">MoneyHelper</a> or <a href="https://www.citizensadvice.org.uk/" rel="noopener">Citizens Advice</a> (not affiliated). Made by <a href="https://www.tchworks.co.uk/free/christmas-budget-calculator-uk-2026/?utm_source=github&amp;utm_medium=repo&amp;utm_campaign=budget-calc-repo" rel="noopener">TCH Works</a>, MIT licence.</p>
+</div>
+<script>
+(function(){
+"use strict";
+function $(i){return document.getElementById(i);}
+// Edit these to change the split. Shares should add up to 100.
+var SPLIT=[["Gifts",50],["Food and drink",25],["Cards, postage and wrapping",5],["Decorations and tree",5],["Days out and activities",5],["Buffer for things you forgot",10]];
+function gbp(x){return "£"+(Math.round(x*100)/100).toLocaleString("en-GB",{minimumFractionDigits:2,maximumFractionDigits:2});}
+function num(id){var v=parseFloat($(id).value);return isFinite(v)&&v>0?v:0;}
+var DAY=86400000,n=new Date(),today=new Date(n.getFullYear(),n.getMonth(),n.getDate());
+var year=today.getMonth()===11&&today.getDate()>25?today.getFullYear()+1:today.getFullYear();
+function pad(x){return (x<10?"0":"")+x;}
+$("xmas").value=year+"-12-25";
+var rowsHtml="",i;
+for(i=1;i<=10;i++){rowsHtml+='<tr><td><input type="text" class="tn" maxlength="30" placeholder="Person '+i+'" aria-label="Person '+i+' name"></td><td><input type="number" class="tv" min="0" step="0.01" inputmode="decimal" placeholder="0" aria-label="Limit for person '+i+' in pounds"></td></tr>';}
+$("trk").innerHTML=rowsHtml;
+function eve(){
+ var v=$("xmas").value.split("-");
+ if(v.length!==3){return new Date(year,11,24);}
+ var d=new Date(+v[0],+v[1]-1,+v[2]);
+ if(isNaN(d.getTime())){return new Date(year,11,24);}
+ return new Date(d.getFullYear(),d.getMonth(),d.getDate()-1);
+}
+function calc(){
+ var total=num("total"),saved=num("saved"),people=Math.max(1,Math.floor(num("people"))||1),h="",k;
+ var gifts=total*SPLIT[0][1]/100;
+ for(k=0;k<SPLIT.length;k++){h+='<tr><td>'+SPLIT[k][0]+'</td><td class="r">'+SPLIT[k][1]+'%</td><td class="r"><b>'+gbp(total*SPLIT[k][1]/100)+'</b></td></tr>';}
+ $("rows").innerHTML=h;$("tot").textContent=gbp(total);
+ var days=Math.round((eve()-today)/DAY),weeks=Math.max(1,Math.ceil(days/7)),left=Math.max(0,total-saved);
+ var wk=days>0?left/weeks:left;
+ $("sum").innerHTML='<div><b>'+gbp(gifts/people)+'</b>per person for gifts</div><div><b>'+gbp(left)+'</b>still to put aside</div><div><b>'+(days>0?gbp(wk):"-")+'</b>'+(days>0?'a week for '+weeks+(weeks===1?' week':' weeks'):'Christmas Eve has passed')+'</div><div><b>'+(days>0?days:0)+'</b>days to Christmas Eve</div>';
+ var m="";
+ if(total<=0){m='<div class="warn">Enter the total you can afford to see the split.</div>';}
+ else if(saved>=total){m='<div class="ok">You have set aside the whole budget. Nothing more to save.</div>';}
+ else if(days>0){m='<div class="ok">Setting aside '+gbp(wk)+' a week from now covers the remaining '+gbp(left)+' by Christmas Eve.</div>';}
+ $("msg").innerHTML=m;
+ track(gifts);
+}
+function track(g){
+ var c=document.querySelectorAll(".tv"),sum=0,k;
+ for(k=0;k<c.length;k++){var v=parseFloat(c[k].value);if(isFinite(v)&&v>0){sum+=v;}}
+ $("ttl").textContent=gbp(sum);
+ if(g===undefined){g=num("total")*SPLIT[0][1]/100;}
+ var t=$("trkmsg");
+ if(sum===0){t.innerHTML="";}
+ else if(sum>g){t.innerHTML='<div class="over">You are '+gbp(sum-g)+' over your gifts pot of '+gbp(g)+'. Trim a limit or use some of the buffer.</div>';}
+ else{t.innerHTML='<div class="ok">'+gbp(g-sum)+' left in your gifts pot of '+gbp(g)+'.</div>';}
+}
+var ids=["total","saved","people","xmas"],q;
+for(q=0;q<ids.length;q++){$(ids[q]).addEventListener("input",calc);}
+var tv=document.querySelectorAll(".tv");for(q=0;q<tv.length;q++){tv[q].addEventListener("input",function(){track();});}
+$("print").onclick=function(){window.print();};
+calc();
+})();
+</script>
+</body>
+</html>
