@@ -4,6 +4,8 @@ Enter what you can afford for Christmas, how many people you are buying gifts fo
 
 **Use it now, no install:** download `index.html` and open it in any browser, or use the page version with a longer how-to at [tchworks.co.uk/free/christmas-budget-calculator-uk-2026](https://www.tchworks.co.uk/free/christmas-budget-calculator-uk-2026/?utm_source=github&utm_medium=repo&utm_campaign=budget-calc-repo).
 
+**Free printable PDF (no install):** [Download the A4 pack](https://github.com/wilsonryan-hue/christmas-budget-calculator/releases/download/v1.0.0-free-printable/christmas-budget-gift-tracker-2026-free.pdf) — blank budget sheet, 10-row gift tracker, worked £600 example, tips ([release notes](https://github.com/wilsonryan-hue/christmas-budget-calculator/releases/tag/v1.0.0-free-printable)).
+
 ## What it does
 
 - Splits your total as a suggestion: 50% gifts, 25% food and drink, 5% cards, postage and wrapping, 5% decorations and tree, 5% days out and activities, 10% buffer.
