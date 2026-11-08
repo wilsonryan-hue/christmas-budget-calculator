@@ -29,3 +29,7 @@ It does simple arithmetic on the numbers you type in. For free, impartial help w
 ## Licence
 
 MIT. Made by [TCH Works](https://www.tchworks.co.uk/?utm_source=github&utm_medium=repo&utm_campaign=budget-calc-repo), which also publishes [Christmas cards](https://www.tchworks.co.uk/cards/christmas/?utm_source=github&utm_medium=repo&utm_campaign=budget-calc-repo), a free [Secret Santa generator](https://www.tchworks.co.uk/free/secret-santa-generator/?utm_source=github&utm_medium=repo&utm_campaign=budget-calc-repo) and a printable [Christmas Budget & Gift Planner](https://tchworks.gumroad.com/l/kazjns?utm_source=github&utm_medium=repo&utm_campaign=budget-calc-repo).
+
+## Also on Gumroad (free)
+
+Free printable Christmas Budget & Gift Tracker 2026 (A4 PDF): https://tchworks.gumroad.com/l/ifyqr
